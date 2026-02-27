@@ -5,38 +5,187 @@
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  background: #1e3a5f;
+  color: white;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  z-index: 1000;
+}
+
+.app {
+  font-family: Arial, sans-serif;
+  text-align: center;
+
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding-top: 140px;
+  padding-bottom: 70px;
+}
+
+.main-content {
+  height: calc(100vh - 210px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 60px;
+}
+
+.collection-date {
+  width: 260px;
+
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.4;
+
+  color: #ffffff;
+}
+
+.collection-date div {
+  font-size: 20px;
+}
+
+.collection-date span {
+  display: block;
+  font-size: 32px;
+  margin-top: 8px;
+
+  color: #4da3ff;
+}
+
+/* ADDRESS STYLING */
+
+.address-display {
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.address-display h2 {
+  font-size: 34px;
+  margin-bottom: 10px;
+}
+
+.address-display p {
+  font-size: 20px;
+}
+
+/* SEARCH BAR SECTION */
+
+.search-section {
+  margin-top: 10px;
+  transition: margin-top 0.6s ease;
+}
+
+.search-section.shifted {
+  margin-top: 40px;
+}
+
+.search-section input {
+  width: 360px;
+  padding: 14px 18px;
+
+  border-radius: 30px;
+  border: 1px solid #ccc;
+
+  font-size: 16px;
+
+  outline: none;
+  transition: all 0.2s ease;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.search-section input:focus {
+  border-color: #1e3a5f;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.search-section button {
+  margin-left: 10px;
+  padding: 12px 18px;
+
+  border-radius: 25px;
+  border: none;
+
+  background: #1e3a5f;
+  color: white;
+  font-weight: bold;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.search-section button:hover {
+  background: #2c5c8a;
+}
+
+.center-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.center-panel .search-section {
+  margin-top: 40px;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+
+  background: #2b4a73;
+  color: white;
+
+  padding: 12px;
+  text-align: center;
+
+  font-size: 18px;
+  z-index: 1000;
+}
+
+.map-placeholder img {
+  width: 420px;
+  height: 260px;
+
+  border-radius: 10px;
+  object-fit: cover;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.map-placeholder {
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeInMap 0.6s ease forwards;
+}
+
+@keyframes fadeInMap {
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
