@@ -17,8 +17,8 @@ function App() {
       <div className="main-content">
 
         <div className="collection-date left">
-          <div>Last Collection Date</div>
-          <span>XX Date</span>
+          <div className="label">Last Collection</div>
+          <div className="date-value">XX Date</div>
         </div>
 
         <div className="center-panel">
@@ -32,8 +32,8 @@ function App() {
         </div>
 
         <div className="collection-date right">
-          <div>Next Collection Date</div>
-          <span>XX Date</span>
+          <div className="label">Next Collection</div>
+          <div className="date-value">XX Date</div>
         </div>
 
       </div>
