@@ -9,6 +9,8 @@ import Footer from "./components/Footer";
 
 function App() {
   const [address, setAddress] = useState("");
+  // TODO: populate userZone from backend response when address is searched
+  const [userZone, setUserZone] = useState(null);
 
   return (
     <div className="app">
@@ -18,22 +20,22 @@ function App() {
 
         <div className="collection-date left">
           <div className="label">Last Collection</div>
-          <div className="date-value">XX Date</div>
+          <div className="date-value">—</div>
         </div>
 
         <div className="center-panel">
 
           {address && <AddressDisplay address={address} />}
 
-          <MapSection address={address} />
+          <MapSection userZone={userZone} />
 
-          <SearchSection address={address} setAddress={setAddress}/>
-          
+          <SearchSection setAddress={setAddress} />
+
         </div>
 
         <div className="collection-date right">
           <div className="label">Next Collection</div>
-          <div className="date-value">XX Date</div>
+          <div className="date-value">—</div>
         </div>
 
       </div>
