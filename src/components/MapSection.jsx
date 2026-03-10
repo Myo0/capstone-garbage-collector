@@ -2,11 +2,13 @@ function MapSection({ address }) {
   if (!address) return null;
 
   return (
-    <div className="map-placeholder">
-      <img
-        src="/placeholder.png"
-        alt="Map placeholder"
-      />
+    <div className="map-container">
+      <div className="map-placeholder">
+        <img
+          src="/placeholder.png"
+          alt="Map placeholder"
+        />
+      </div>
     </div>
   );
 }
