@@ -1,9 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { hasApiKey, importLibrary, CORNER_BROOK_BOUNDS } from '../lib/maps';
 
-function SearchSection({ setAddress }) {
-  const [inputValue, setInputValue] = useState('');
+function SearchSection({ setAddress, savedAddress }) {
+  const [inputValue, setInputValue] = useState(savedAddress || '');
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState('');
   const inputRef = useRef(null);
+
+  // Pre-populate input when a saved address is loaded on first render
+  useEffect(() => {
+    if (savedAddress && !inputValue) setInputValue(savedAddress);
+  }, [savedAddress]);
 
   useEffect(() => {
     if (!hasApiKey || !inputRef.current) return;
@@ -51,6 +58,45 @@ function SearchSection({ setAddress }) {
     setAddress(sample);
   };
 
+  const handleUseLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    setLocating(true);
+    setLocationError('');
+
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const { Geocoder } = await importLibrary('geocoding');
+          const geocoder = new Geocoder();
+          const result = await geocoder.geocode({
+            location: { lat: coords.latitude, lng: coords.longitude },
+          });
+
+          if (result.results[0]) {
+            const addr = result.results[0].formatted_address;
+            setInputValue(addr);
+            setAddress(addr);
+          } else {
+            setLocationError('Could not determine your address.');
+          }
+        } catch {
+          setLocationError('Could not determine your address.');
+        } finally {
+          setLocating(false);
+        }
+      },
+      () => {
+        setLocating(false);
+        setLocationError('Location access was denied.');
+      },
+      { timeout: 10000 }
+    );
+  };
+
   return (
     <div className="search-section">
       <div className="search-row">
@@ -66,9 +112,15 @@ function SearchSection({ setAddress }) {
           Search
         </button>
       </div>
-      <button className="btn-secondary" onClick={handleSampleAddress}>
-        Use Sample Address
-      </button>
+      <div className="search-secondary-row">
+        <button className="btn-secondary" onClick={handleUseLocation} disabled={locating}>
+          {locating ? 'Locating…' : '⊙ Use My Location'}
+        </button>
+        <button className="btn-secondary" onClick={handleSampleAddress}>
+          Use Sample Address
+        </button>
+      </div>
+      {locationError && <p className="location-error">{locationError}</p>}
     </div>
   );
 }

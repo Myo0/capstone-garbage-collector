@@ -129,6 +129,28 @@
   line-height: 1.2;
 }
 
+.zone-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.zone-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.zone-badge-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 /* ---- CENTER PANEL ---- */
 
 .center-panel {
@@ -196,6 +218,18 @@
   display: flex;
   gap: 10px;
   align-items: center;
+}
+
+.search-secondary-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.location-error {
+  font-size: 0.78rem;
+  color: #f87171;
+  text-align: center;
 }
 
 .search-section input {
