@@ -1,12 +1,11 @@
-function AddressDisplay({ address }) {
+function AddressDisplay({ address, onClear }) {
   return (
     <div className="address-display">
       <h2>Your address:</h2>
-      <p>
-        {address
-          ? address
-          : "You have not given us your address."}
-      </p>
+      <div className="address-display-row">
+        <p>{address}</p>
+        <button className="address-clear-btn" onClick={onClear} title="Clear address">×</button>
+      </div>
     </div>
   );
 }

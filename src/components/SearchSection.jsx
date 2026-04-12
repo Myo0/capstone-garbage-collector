@@ -1,61 +1,75 @@
 import { useEffect, useRef, useState } from 'react';
-import { hasApiKey, importLibrary, CORNER_BROOK_BOUNDS } from '../lib/maps';
+import { hasApiKey, importLibrary } from '../lib/maps';
 
-function SearchSection({ setAddress, savedAddress }) {
-  const [inputValue, setInputValue] = useState(savedAddress || '');
-  const [locating, setLocating] = useState(false);
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+
+function SearchSection({ onAddressSelect, savedAddress }) {
+  const [inputValue, setInputValue]     = useState(savedAddress || '');
+  const [results, setResults]           = useState([]);
+  const [noResults, setNoResults]       = useState(false);
+  const [locating, setLocating]         = useState(false);
   const [locationError, setLocationError] = useState('');
-  const inputRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
+  const containerRef     = useRef(null);
 
   // Pre-populate input when a saved address is loaded on first render
   useEffect(() => {
     if (savedAddress && !inputValue) setInputValue(savedAddress);
   }, [savedAddress]);
 
+  // Close dropdown when clicking outside the search container
   useEffect(() => {
-    if (!hasApiKey || !inputRef.current) return;
+    const handleClickOutside = e => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setResults([]);
+        setNoResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-    importLibrary('places').then(({ Autocomplete }) => {
-      if (!inputRef.current) return;
+  const searchBackend = async (query) => {
+    if (!query || query.trim().length < 2) {
+      setResults([]);
+      setNoResults(false);
+      return [];
+    }
+    try {
+      const resp = await fetch(`${BACKEND_URL}/api/search?q=${encodeURIComponent(query.trim())}`);
+      const data = await resp.json();
+      setResults(data);
+      setNoResults(data.length === 0);
+      return data;
+    } catch {
+      setResults([]);
+      setNoResults(false);
+      return [];
+    }
+  };
 
-      const bounds = {
-        north: CORNER_BROOK_BOUNDS.north,
-        south: CORNER_BROOK_BOUNDS.south,
-        east: CORNER_BROOK_BOUNDS.east,
-        west: CORNER_BROOK_BOUNDS.west,
-      };
+  const handleInputChange = e => {
+    const val = e.target.value;
+    setInputValue(val);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => searchBackend(val), 300);
+  };
 
-      const autocomplete = new Autocomplete(inputRef.current, {
-        bounds,
-        strictBounds: true,
-        componentRestrictions: { country: 'ca' },
-        fields: ['formatted_address'],
-        types: ['address'],
-      });
+  const handleSelect = result => {
+    setInputValue(result.full_address);
+    setResults([]);
+    setNoResults(false);
+    onAddressSelect(result.aid, result.full_address);
+  };
 
-      autocomplete.addListener('place_changed', () => {
-        const place = autocomplete.getPlace();
-        if (place.formatted_address) {
-          setInputValue(place.formatted_address);
-          setAddress(place.formatted_address);
-        }
-      });
-    });
-  }, [setAddress]);
-
-  const handleSearch = () => {
-    const trimmed = inputValue.trim();
-    if (trimmed) setAddress(trimmed);
+  const handleSearch = async () => {
+    const data = await searchBackend(inputValue);
+    if (data.length === 1) handleSelect(data[0]);
   };
 
   const handleKeyDown = e => {
     if (e.key === 'Enter') handleSearch();
-  };
-
-  const handleSampleAddress = () => {
-    const sample = '123 Main Street, Corner Brook, NL';
-    setInputValue(sample);
-    setAddress(sample);
+    if (e.key === 'Escape') { setResults([]); setNoResults(false); }
   };
 
   const handleUseLocation = () => {
@@ -63,7 +77,6 @@ function SearchSection({ setAddress, savedAddress }) {
       setLocationError('Geolocation is not supported by your browser.');
       return;
     }
-
     setLocating(true);
     setLocationError('');
 
@@ -77,9 +90,13 @@ function SearchSection({ setAddress, savedAddress }) {
           });
 
           if (result.results[0]) {
-            const addr = result.results[0].formatted_address;
-            setInputValue(addr);
-            setAddress(addr);
+            // Extract just the street part (e.g. "1 Main St" from "1 Main St, Corner Brook, NL")
+            const streetPart = result.results[0].formatted_address.split(',')[0].trim();
+            setInputValue(streetPart);
+            const data = await searchBackend(streetPart);
+            if (data.length === 1) handleSelect(data[0]);
+            else if (data.length === 0) setLocationError('Your location is outside the Corner Brook service area.');
+            // If multiple results, the dropdown will show for the user to pick
           } else {
             setLocationError('Could not determine your address.');
           }
@@ -97,17 +114,40 @@ function SearchSection({ setAddress, savedAddress }) {
     );
   };
 
+  const handleSampleAddress = async () => {
+    const sample = '1 BLANCHARDS AVE';
+    setInputValue(sample);
+    const data = await searchBackend(sample);
+    if (data.length > 0) handleSelect(data[0]);
+  };
+
+  const showDropdown = results.length > 0 || noResults;
+
   return (
-    <div className="search-section">
+    <div className="search-section" ref={containerRef}>
       <div className="search-row">
-        <input
-          ref={inputRef}
-          type="text"
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Enter your address"
-        />
+        <div className="search-input-wrapper">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            placeholder="Enter your address"
+          />
+          {showDropdown && (
+            <ul className="search-dropdown">
+              {results.length > 0
+                ? results.map(r => (
+                    <li key={r.aid} onMouseDown={() => handleSelect(r)}>
+                      <span className="dropdown-address">{r.full_address}</span>
+                      <span className="dropdown-zone">{r.collection_day}</span>
+                    </li>
+                  ))
+                : <li className="dropdown-no-results">No addresses found</li>
+              }
+            </ul>
+          )}
+        </div>
         <button className="btn-primary" onClick={handleSearch}>
           Search
         </button>

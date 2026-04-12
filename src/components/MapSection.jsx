@@ -22,6 +22,11 @@ function styleZones(map, userZone) {
   });
 }
 
+const LEGEND_ITEMS = Object.entries(ZONE_COLORS).map(([zone, color]) => ({
+  label: zone.replace(' Garbage Collection Zone', ''),
+  color,
+}));
+
 function MapSection({ userZone }) {
   const mapDivRef = useRef(null);
   const mapRef = useRef(null);
@@ -68,6 +73,17 @@ function MapSection({ userZone }) {
           <img src="/placeholder.png" alt="Map placeholder" />
         </div>
       )}
+      <div className="map-legend">
+        {LEGEND_ITEMS.map(({ label, color }) => (
+          <div
+            key={label}
+            className={`legend-item${userZone && userZone.startsWith(label) ? ' legend-item--active' : ''}`}
+          >
+            <span className="legend-dot" style={{ background: color }} />
+            <span className="legend-label">{label}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

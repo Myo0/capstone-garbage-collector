@@ -207,6 +207,59 @@
 
 /* ---- SEARCH SECTION ---- */
 
+.search-input-wrapper {
+  position: relative;
+}
+
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #0f2035;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  z-index: 200;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.search-dropdown li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.search-dropdown li:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.dropdown-address {
+  font-size: 0.9rem;
+  color: #e8f0fe;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-zone {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+
 .search-section {
   display: flex;
   flex-direction: column;
@@ -290,6 +343,192 @@
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* ---- DATE CARD STATES ---- */
+
+.date-empty {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.25);
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.6; }
+}
+
+.date-skeleton {
+  height: 52px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 8px 0;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+/* ---- REC TYPE PILL ---- */
+
+.rec-type-pill {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+/* ---- ADDRESS DISPLAY CLEAR ---- */
+
+.address-display-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.address-clear-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.address-clear-btn:hover {
+  border-color: #f87171;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* ---- MAP LEGEND ---- */
+
+.map-container {
+  position: relative;
+}
+
+.map-legend {
+  position: absolute;
+  bottom: 28px;
+  left: 10px;
+  background: rgba(10, 22, 36, 0.82);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.legend-item--active {
+  opacity: 1;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #e8f0fe;
+  white-space: nowrap;
+}
+
+/* ---- UPCOMING COLLECTIONS ---- */
+
+.upcoming-collections {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+
+.upcoming-title {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 10px;
+}
+
+.upcoming-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.upcoming-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.upcoming-list li:last-child {
+  border-bottom: none;
+}
+
+.upcoming-list li.upcoming-next .upcoming-date {
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.upcoming-date {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.upcoming-rec {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ---- SEARCH DROPDOWN NO RESULTS ---- */
+
+.dropdown-no-results {
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
+  cursor: default;
+}
+
 /* ---- FOOTER ---- */
 
 .footer {
@@ -334,9 +573,10 @@
     align-items: stretch;
   }
 
+  /* Date cards: horizontal strip with label on left, content on right */
   .collection-date {
     width: 100%;
-    padding: 20px 24px;
+    padding: 16px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -345,15 +585,40 @@
 
   .collection-date .label {
     margin-bottom: 0;
+    text-align: left;
+  }
+
+  .collection-date-content {
+    text-align: right;
   }
 
   .collection-date .date-value {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+  }
+
+  .collection-date .date-empty {
+    font-size: 0.72rem;
+    max-width: 160px;
+    text-align: right;
+  }
+
+  .collection-date .date-skeleton {
+    width: 120px;
+    height: 36px;
+  }
+
+  .collection-date .zone-badge {
+    justify-content: flex-end;
+    margin-top: 6px;
+  }
+
+  .collection-date .rec-type-pill {
+    margin-top: 6px;
   }
 
   .center-panel {
     order: -1;
-    gap: 16px;
+    gap: 14px;
   }
 
   .map-container {
@@ -362,13 +627,51 @@
     border-radius: 10px;
   }
 
+  /* Shrink legend on small map */
+  .map-legend {
+    padding: 5px 9px;
+    gap: 3px;
+    bottom: 24px;
+  }
+
+  .legend-label {
+    font-size: 0.63rem;
+  }
+
+  .legend-dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  /* Search: let input grow to fill available space */
+  .search-row {
+    width: 100%;
+  }
+
+  .search-input-wrapper {
+    flex: 1;
+  }
+
   .search-section input {
-    width: 220px;
+    width: 100%;
     font-size: 0.9rem;
+    box-sizing: border-box;
   }
 
   .btn-primary {
     padding: 12px 16px;
     font-size: 0.88rem;
+    white-space: nowrap;
+  }
+
+  /* Secondary buttons wrap on very small screens */
+  .search-secondary-row {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Upcoming collections: full width */
+  .upcoming-collections {
+    max-width: 100%;
   }
 }
