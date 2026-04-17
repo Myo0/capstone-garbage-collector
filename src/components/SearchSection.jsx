@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { hasApiKey, importLibrary } from '../lib/maps';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 function SearchSection({ onAddressSelect, savedAddress }) {
-  const [inputValue, setInputValue]     = useState(savedAddress || '');
-  const [results, setResults]           = useState([]);
-  const [noResults, setNoResults]       = useState(false);
-  const [locating, setLocating]         = useState(false);
+  const [inputValue, setInputValue]       = useState(savedAddress || '');
+  const [results, setResults]             = useState([]);
+  const [noResults, setNoResults]         = useState(false);
+  const [locating, setLocating]           = useState(false);
   const [locationError, setLocationError] = useState('');
   const searchTimeoutRef = useRef(null);
   const containerRef     = useRef(null);
@@ -83,23 +82,28 @@ function SearchSection({ onAddressSelect, savedAddress }) {
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
         try {
-          const { Geocoder } = await importLibrary('geocoding');
-          const geocoder = new Geocoder();
-          const result = await geocoder.geocode({
-            location: { lat: coords.latitude, lng: coords.longitude },
-          });
+          const resp = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&format=json`,
+            { headers: { 'Accept-Language': 'en' } }
+          );
+          const data = await resp.json();
 
-          if (result.results[0]) {
-            // Extract just the street part (e.g. "1 Main St" from "1 Main St, Corner Brook, NL")
-            const streetPart = result.results[0].formatted_address.split(',')[0].trim();
-            setInputValue(streetPart);
-            const data = await searchBackend(streetPart);
-            if (data.length === 1) handleSelect(data[0]);
-            else if (data.length === 0) setLocationError('Your location is outside the Corner Brook service area.');
-            // If multiple results, the dropdown will show for the user to pick
-          } else {
+          // Build street address from house number + road name, uppercased to match DB
+          const streetPart = [data.address?.house_number, data.address?.road]
+            .filter(Boolean)
+            .join(' ')
+            .toUpperCase();
+
+          if (!streetPart) {
             setLocationError('Could not determine your address.');
+            return;
           }
+
+          setInputValue(streetPart);
+          const results = await searchBackend(streetPart);
+          if (results.length === 1) handleSelect(results[0]);
+          else if (results.length === 0) setLocationError('Your location is outside the Corner Brook service area.');
+          // If multiple results, the dropdown will show for the user to pick
         } catch {
           setLocationError('Could not determine your address.');
         } finally {

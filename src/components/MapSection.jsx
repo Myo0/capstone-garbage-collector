@@ -1,83 +1,77 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  hasApiKey,
-  importLibrary,
-  ZONE_COLORS,
-  CORNER_BROOK_CENTER,
-  DARK_MAP_STYLES,
-} from '../lib/maps';
-
-function styleZones(map, userZone) {
-  map.data.setStyle(feature => {
-    const layer = feature.getProperty('Layer');
-    const color = ZONE_COLORS[layer] ?? '#888888';
-    const isUserZone = layer === userZone;
-    return {
-      fillColor: color,
-      fillOpacity: userZone ? (isUserZone ? 0.65 : 0.1) : 0.35,
-      strokeColor: color,
-      strokeOpacity: userZone ? (isUserZone ? 1.0 : 0.35) : 0.8,
-      strokeWeight: isUserZone ? 3 : 1.5,
-    };
-  });
-}
+import { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { ZONE_COLORS, CORNER_BROOK_CENTER } from '../lib/maps';
 
 const LEGEND_ITEMS = Object.entries(ZONE_COLORS).map(([zone, color]) => ({
   label: zone.replace(' Garbage Collection Zone', ''),
   color,
+  zone,
 }));
 
+function getZoneStyle(layer, userZone) {
+  const color = ZONE_COLORS[layer] ?? '#888888';
+  const isUserZone = layer === userZone;
+  return {
+    fillColor: color,
+    fillOpacity: userZone ? (isUserZone ? 0.65 : 0.1) : 0.35,
+    color,
+    opacity: userZone ? (isUserZone ? 1.0 : 0.35) : 0.8,
+    weight: isUserZone ? 3 : 1.5,
+  };
+}
+
 function MapSection({ userZone }) {
-  const mapDivRef = useRef(null);
-  const mapRef = useRef(null);
-  const [mapReady, setMapReady] = useState(false);
+  const mapDivRef  = useRef(null);
+  const mapRef     = useRef(null);
+  const geoJsonRef = useRef(null);
 
   useEffect(() => {
-    if (!hasApiKey || !mapDivRef.current || mapRef.current) return;
+    if (!mapDivRef.current || mapRef.current) return;
 
-    importLibrary('maps').then(({ Map }) => {
-      if (mapRef.current || !mapDivRef.current) return;
+    const map = L.map(mapDivRef.current, {
+      center: [CORNER_BROOK_CENTER.lat, CORNER_BROOK_CENTER.lng],
+      zoom: 12,
+      zoomControl: true,
+    });
 
-      const map = new Map(mapDivRef.current, {
-        center: CORNER_BROOK_CENTER,
-        zoom: 12,
-        styles: DARK_MAP_STYLES,
-        disableDefaultUI: true,
-        zoomControl: true,
-        zoomControlOptions: { position: 7 }, // RIGHT_CENTER
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20,
+    }).addTo(map);
+
+    mapRef.current = map;
+
+    fetch('/zones.geojson')
+      .then(r => r.json())
+      .then(data => {
+        const geoLayer = L.geoJSON(data, {
+          style: feature => getZoneStyle(feature.properties.Layer, null),
+        }).addTo(map);
+        geoJsonRef.current = geoLayer;
       });
 
-      mapRef.current = map;
-
-      fetch('/zones.geojson')
-        .then(r => r.json())
-        .then(data => {
-          map.data.addGeoJson(data);
-          styleZones(map, null);
-          setMapReady(true);
-        });
-    });
+    return () => {
+      map.remove();
+      mapRef.current  = null;
+      geoJsonRef.current = null;
+    };
   }, []);
 
   useEffect(() => {
-    if (!mapRef.current || !mapReady) return;
-    styleZones(mapRef.current, userZone);
-  }, [userZone, mapReady]);
+    if (!geoJsonRef.current) return;
+    geoJsonRef.current.setStyle(feature => getZoneStyle(feature.properties.Layer, userZone));
+  }, [userZone]);
 
   return (
     <div className="map-container">
-      {hasApiKey ? (
-        <div ref={mapDivRef} style={{ width: '100%', height: '100%' }} />
-      ) : (
-        <div className="map-placeholder">
-          <img src="/placeholder.png" alt="Map placeholder" />
-        </div>
-      )}
+      <div ref={mapDivRef} style={{ width: '100%', height: '100%' }} />
       <div className="map-legend">
-        {LEGEND_ITEMS.map(({ label, color }) => (
+        {LEGEND_ITEMS.map(({ label, color, zone }) => (
           <div
             key={label}
-            className={`legend-item${userZone && userZone.startsWith(label) ? ' legend-item--active' : ''}`}
+            className={`legend-item${userZone === zone ? ' legend-item--active' : ''}`}
           >
             <span className="legend-dot" style={{ background: color }} />
             <span className="legend-label">{label}</span>

@@ -13,9 +13,8 @@ function Header() {
       </div>
 
       <div className="header-buttons">
-        <button>Official Corner Brook Website</button>
-        <button>Share</button>
-        <button>Yearly Schedule</button>
+        <a href="https://www.cornerbrook.com/city-services-bak/garbage-and-recycling/" target="_blank" rel="noreferrer" className="btn-header-link">Official Corner Brook Website</a>
+
       </div>
     </header>
   );
