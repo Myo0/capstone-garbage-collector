@@ -12,9 +12,16 @@ const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+const ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+app.use(cors({
+  origin: ALLOWED_ORIGINS,
+}));
 app.use(json());
 
 // Health check
