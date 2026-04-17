@@ -14,7 +14,7 @@ import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-config({ path: path.join(__dirname, '../.env') });
+config({ path: path.join(__dirname, '../.env'), override: false });
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
