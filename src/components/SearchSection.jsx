@@ -118,13 +118,6 @@ function SearchSection({ onAddressSelect, savedAddress }) {
     );
   };
 
-  const handleSampleAddress = async () => {
-    const sample = '1 BLANCHARDS AVE';
-    setInputValue(sample);
-    const data = await searchBackend(sample);
-    if (data.length > 0) handleSelect(data[0]);
-  };
-
   const showDropdown = results.length > 0 || noResults;
 
   return (
@@ -159,9 +152,6 @@ function SearchSection({ onAddressSelect, savedAddress }) {
       <div className="search-secondary-row">
         <button className="btn-secondary" onClick={handleUseLocation} disabled={locating}>
           {locating ? 'Locating…' : '⊙ Use My Location'}
-        </button>
-        <button className="btn-secondary" onClick={handleSampleAddress}>
-          Use Sample Address
         </button>
       </div>
       {locationError && <p className="location-error">{locationError}</p>}
